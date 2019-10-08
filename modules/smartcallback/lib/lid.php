@@ -16,17 +16,21 @@ class LID {
      *
      * @param array array of fields
      */
-    public function addDeal () {
+    public function addDeal (array $array) {
 
-        $res = DealTable::add(
+        $res = \Bitrix\Crm\DealTable::add(
             [
-                "TITLE" => "Новы лид по звонку с из SmartCallBack",
+                "TITLE" => "Новый лид по звонку с из SmartCallBack",
                 "DATE_CREATE" => new DateTime(),
                 "DATE_MODIFY" => new DateTime(),
                 "CREATED_BY_ID" => $this->_userId,
                 "MODIFY_BY_ID" => $this->_userId,
                 "ASSIGNED_BY_ID" => $this->_userId,
-                "STAGE_SEMANTIC_ID" => N,
+                "STAGE_SEMANTIC_ID" => P,
+                "IS_NEW"    => N,
+                "COMPANY_ID" => 0,
+                "OPENED"    => N,
+                "CATEGORY_ID" => 4,
                 "STAGE_ID" => "NEW",
             ]
         );

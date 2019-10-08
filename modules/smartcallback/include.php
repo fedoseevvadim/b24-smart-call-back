@@ -12,5 +12,7 @@ use Bitrix\Main\Loader;
         'SmartCallBack\statItems' => 'lib/statItem.php',
         'SmartCallBack\downloadItems' => 'lib/downloadItems.php',
         'SmartCallBack\LID' => 'lib/lid.php',
+        'SmartCallBack\VICall' => 'lib/call.php',
+        'SmartCallBack\crmActivity' => 'lib/crmActivity.php',
     )
 );

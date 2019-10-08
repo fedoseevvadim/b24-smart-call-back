@@ -16,6 +16,7 @@ class smartcallback extends CModule {
     var $MODULE_CSS;
     var $MODULE_GROUP_RIGHTS = "Y";
     var $PARTNER_NAME  = "smartcallback";
+    var $pathToDB = "/local/modules/smartcallback/install/db/";
 
     function smartcallback() {
         $arModuleVersion = array();
@@ -30,10 +31,48 @@ class smartcallback extends CModule {
 
     }
 
+    function InstallDB($arParams = array()) {
+
+        global $DB, $APPLICATION;
+        $this->errors = false;
+
+        // Database tables creation
+        $this->errors = $DB->RunSQLBatch($_SERVER["DOCUMENT_ROOT"].$this->pathToDB.strtolower($DB->type)."/install.sql");
+
+        if($this->errors !== false)
+        {
+            $APPLICATION->ThrowException(implode("<br>", $this->errors));
+            return false;
+        }
+    }
+
+    function UnInstallDB($arParams = array())
+    {
+        global $DB, $APPLICATION;
+        $this->errors = false;
+
+        if(!array_key_exists("savedata", $arParams) || $arParams["savedata"] != "Y")
+        {
+            $this->errors = $DB->RunSQLBatch($_SERVER["DOCUMENT_ROOT"].$this->pathToDB.strtolower($DB->type)."/uninstall.sql");
+
+        }
+
+
+        UnRegisterModule("smartcallback");
+
+        if($this->errors !== false)
+        {
+            $APPLICATION->ThrowException(implode("<br>", $this->errors));
+            return false;
+        }
+
+        return true;
+    }
+
     function InstallFiles($arParams = array()) {
 
         if ($_ENV["COMPUTERNAME"]!='BX') {
-            CopyDirFiles($_SERVER["DOCUMENT_ROOT"]."/local/components/smartcallback/install/components", $_SERVER["DOCUMENT_ROOT"]."/local/components/components", true, true);
+            CopyDirFiles($_SERVER["DOCUMENT_ROOT"]."/local/modules/smartcallback/install/components", $_SERVER["DOCUMENT_ROOT"]."/local/components/", true, true);
         }
         return true;
     }
@@ -51,11 +90,13 @@ class smartcallback extends CModule {
 
         RegisterModule($this->MODULE_ID);
         $this->InstallFiles();
+        $this->InstallDB();
     }
 
     function DoUninstall() {
 
         $this->UnInstallFiles();
+        $this->UnInstallDB();
         UnRegisterModule($this->MODULE_ID);
         return true;
     }
