@@ -12,7 +12,7 @@ class LID {
 
 
     /**
-     * Create a deal
+     * Add a deal
      *
      * @param array array of fields
      */
@@ -36,7 +36,7 @@ class LID {
         );
 
         if ($res->isSuccess()) {
-            print('Added with ID = '.$res->getId());
+            //print('Added with ID = '.$res->getId());
         }  else  {
             print_r($res->getErrorMessages());
         }

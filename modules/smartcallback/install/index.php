@@ -38,6 +38,8 @@ class smartcallback extends CModule {
 
         // Database tables creation
         $this->errors = $DB->RunSQLBatch($_SERVER["DOCUMENT_ROOT"].$this->pathToDB.strtolower($DB->type)."/install.sql");
+        \CAgent::AddAgent("\SmartCallBack\Cron::downloadItems();", $this->MODULE_ID, $period= "Y", $interval = 30, "", "Y", "","", 1 );
+        \CAgent::AddAgent("\SmartCallBack\Cron::writeItems();", $this->MODULE_ID, $period= "Y", $interval = 30, "", "Y", "","", 1 );
 
         if($this->errors !== false)
         {
@@ -57,6 +59,7 @@ class smartcallback extends CModule {
 
         }
 
+        \CAgent::RemoveAgent($this->MODULE_ID, $this->MODULE_ID);
 
         UnRegisterModule("smartcallback");
 
