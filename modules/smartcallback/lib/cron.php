@@ -45,7 +45,7 @@ class Cron  {
         $API_TOKEN      = \COption::GetOptionString(Struct::moduleID, "API_TOKEN");
         $API_SIGNATURE  = \COption::GetOptionString(Struct::moduleID, "API_SIGNATURE");
 
-        if ( isset( $CLIENT_TOKEN ) AND isset( $API_TOKEN ) AND isset( $API_SIGNATURE ) ) {
+        if ( strlen( $CLIENT_TOKEN ) > 0 AND strlen ( $API_TOKEN ) > 0 AND strlen( $API_SIGNATURE ) > 0 ) {
 
             try {
 
@@ -117,12 +117,94 @@ class Cron  {
     public static function createLids () {
 
         $statItems  = new statItems();
+        $lid        = new LID();
+        $arrElements = $statItems->getItemsWithOutLid();
 
-        foreach ( $statItems->lastItems as $item ) {
+        foreach ( $arrElements as $item ) {
+
+            // TODO
+            // Нужно дописать код который будет проверять если такой лид по номеру телефона
+
+            $lidID = $lid->addDeal($item);
+
+            if ( $lidID > 0 ) {
+
+                $arrUpdate = [
+                    'lid' => $lidID,
+                ];
+
+                $statItems->updateItem($item['id'], $arrUpdate);
+
+                $userID     = 1;
+                $phone      = $item['phone'];
+                $dealID     = $lidID;
+                $duration   = $item['duration'];
+
+                // Создадим звонок
+                $VIcall = new VICall( $userID, $phone, $dealID );
+                $ID     = $VIcall->createCall($duration, $dealID);
+                $callId = $VIcall->callID; // Получим ID звонка
+
+                // Создадим Activity
+                $crmActivity = new \SmartCallBack\crmActivity( $userID, $phone, $dealID, $callId );
+                $crmActivity->addActivity([$item['id_record_bx']], $duration);
+
+            }
+
 
         }
 
     }
+
+
+    /**
+    * write call to B24
+    */
+    public function writeCallsToB24() {
+
+        $statItems  = new statItems();
+        $arrElements = $statItems->getWroteCalls();
+
+        foreach ( $arrElements as $elem ) {
+
+            if ( strlen($elem["record_url"]) > 0 ) {
+
+                $file_name = basename($elem["record_url"]); // get file name from url
+                $pathToFile = $_SERVER['DOCUMENT_ROOT'] . \SmartCallBack\downloadItems::downloadDir . $file_name;
+
+                $storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId(1);
+                $folder = $storage->getRootObject();
+
+                if ($folder) {
+
+                    if ($storage) {
+
+                        $fileArray  = \CFile::MakeFileArray($pathToFile);
+                        $arrData    = ['CREATED_BY' => 1];
+
+                        $file = $folder->uploadFile($fileArray, $arrData);
+
+                        $fileID = $file->getId();
+
+
+                        if ( $fileID > 0 ) {
+
+                            $arrUpdate = [
+                                'id_record_bx' => $fileID,
+                            ];
+
+                            $statItems->updateItem( $elem['id'], $arrUpdate );
+                        }
+
+                    }
+
+                }
+            }
+
+        }
+
+    }
+
 
 
 }

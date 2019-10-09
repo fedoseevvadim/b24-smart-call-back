@@ -140,6 +140,57 @@ class statItems extends StatTable {
 
     }
 
+    /**
+     * get items with out lid
+     *
+     */
+    public function getItemsWithOutLid () {
+
+        $arrItems = [];
+
+        $res = $this->_statTable->getList([
+            'select' => [ '*' ],
+            'filter' => [
+                            '=record_written' => 1,
+                            '=lid' => 0,
+                            '!=id_record_bx' => 0,
+                        ],
+            'limit' => $this->_limitFilesToDownload,
+        ]);
+
+        while( $item = $res->fetch() ) {
+            $arrItems[] = $item;
+        }
+
+        return $arrItems;
+    }
+
+    /**
+    * get calls from tables
+    *
+    */
+    public function getWroteCalls () {
+
+        $arrItems = [];
+
+        $res = $this->_statTable->getList([
+            'select' => [ '*' ],
+            'filter' => [
+                '=record_written' => 1,
+                '=lid' => 0,
+                '=id_record_bx' => 0,
+                '!=record_url' => 'NULL'
+            ],
+            'limit' => $this->_limitFilesToDownload,
+        ]);
+
+        while( $item = $res->fetch() ) {
+            $arrItems[] = $item;
+        }
+
+        return $arrItems;
+    }
+
 }
 
 ?>

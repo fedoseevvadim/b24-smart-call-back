@@ -134,6 +134,14 @@ class StatTable extends Main\Entity\DataManager
                 'data_type' => 'integer',
                 'title' => Loc::getMessage('STAT_ENTITY_RECORD_WRITTEN_FIELD'),
             ),
+            'lid' => array(
+                'data_type' => 'integer',
+                'title' => Loc::getMessage('STAT_ENTITY_LID_FIELD'),
+            ),
+            'id_record_bx' => array(
+                'data_type' => 'integer',
+                'title' => Loc::getMessage('STAT_ENTITY_ID_RECORD_BX_FIELD'),
+            ),
         );
     }
     /**
