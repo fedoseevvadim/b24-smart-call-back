@@ -24,6 +24,21 @@ if ( CModule::IncludeModule("smartcallback")) {
         SmartCallBack\Cron::createObj();
         SmartCallBack\Cron::writeCallsToB24();
 
+//        $storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId(1);
+//
+//        if ($storage) {
+//            $fileArray = \CFile::MakeFileArray($_SERVER['DOCUMENT_ROOT'].'/test.jpg');
+//
+//            $file = $folder->uploadFile($fileArray, array(
+//                'CREATED_BY' => 1
+//            ));
+//
+//        }
+
+
+
+        //$res = \Bitrix\Disk\Internals\StorageTable::add($storage);
+
 //        $userID = 1;
 //        $phone = "79152955011";
 //        $dealID = 41;

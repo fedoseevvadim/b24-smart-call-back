@@ -5,7 +5,7 @@ namespace SmartCallBack;
 class statItems extends StatTable {
 
     private $_statTable;
-    private $_limitFilesToDownload = 10;
+    private $_limitFilesToDownload = 1;
 
     public $date_to;
     public $date_from;
@@ -155,6 +155,31 @@ class statItems extends StatTable {
                             '=lead' => 0,
                             '!=id_record_bx' => 0,
                         ],
+            'limit' => $this->_limitFilesToDownload,
+        ]);
+
+        while( $item = $res->fetch() ) {
+            $arrItems[] = $item;
+        }
+
+        return $arrItems;
+    }
+
+    /**
+     * get items with out Deal
+     *
+     */
+    public function getItemsWithOutDeal () {
+
+        $arrItems = [];
+
+        $res = $this->_statTable->getList([
+            'select' => [ '*' ],
+            'filter' => [
+                '=record_written' => 1,
+                '=deal' => 0,
+                '!=id_record_bx' => 0,
+            ],
             'limit' => $this->_limitFilesToDownload,
         ]);
 

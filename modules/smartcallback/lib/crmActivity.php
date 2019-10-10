@@ -14,7 +14,8 @@ class crmActivity extends \CCrmActivity{
     private $_typeId = 2;
     private $_resultStrem  = 1;
     private $_direction = 1;
-    private $_ownerTypeId = 2;  // VoxImplant ID
+    private $_ownerTypeIdLead = 1;  // LEAD
+    private $_ownerTypeIdDeal = 2;  // DEAL
     private $_priority = 2;
     private $_completed = "Y";
     private $_providerTypeId = "CALL";
@@ -37,8 +38,24 @@ class crmActivity extends \CCrmActivity{
 
     /*
     * @param $storageElements array of files (their IDs)
+    * @param $duration - duration it is time of call
     */
-    public function addActivity ( array $storageElements, int $duration ) {
+    public function addActivity ( array $storageElements, int $duration, string $ownerType) {
+
+        $owner = 1;
+
+        switch ($ownerType) {
+
+            case "deal":
+
+                $owner = $this->_ownerTypeIdDeal;
+                break;
+
+            case "lead":
+
+                $owner = $this->_ownerTypeIdLead;
+                break;
+        }
 
         $array = [
             "TYPE_ID"               => $this->_typeId,
@@ -50,7 +67,7 @@ class crmActivity extends \CCrmActivity{
             "RESPONSIBLE_ID"        => $this->_userId,
             "PRIORITY"              => $this->_priority,
             "OWNER_ID"              => $this->_dealID,
-            "OWNER_TYPE_ID"         => $this->_ownerTypeId,
+            "OWNER_TYPE_ID"         => $owner,
             "DESCRIPTION"           => $this->_prefixDescription . $this->callDurationAsText($duration),
             "ORIGIN_ID"             => $this->_prefix.$this->_callID,
             "AUTHOR_ID"             => $this->_userId,

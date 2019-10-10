@@ -3,7 +3,7 @@
 namespace SmartCallBack;
 
 use Protobuf\Exception;
-
+use \Bitrix\Disk\Driver;
 
 class Cron  {
 
@@ -32,8 +32,6 @@ class Cron  {
 
         $date_to     = time();
         $date_from  = $date_to - ( Struct::resForLastDays * 24 * 60 * 60 ) ;
-
-        //echo $_SERVER["DOCUMENT_ROOT"];
 
         $result = file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, date(self::dateFormat) . " Start");
 
@@ -120,12 +118,19 @@ class Cron  {
 
         $statItems  = new statItems();
         $lid        = new LID();
-        $arrElements = $statItems->getItemsWithOutLead();
 
         $bCreateLead  = \COption::GetOptionString(Struct::moduleID, "CREATE_LEAD");
         $bCreateDeal  = \COption::GetOptionString(Struct::moduleID, "CREATE_DEAL");
 
-        $userID       = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
+        if ( $bCreateLead === "Y" ) {
+            $arrElements = $statItems->getItemsWithOutLead();
+        }
+
+        if ( $bCreateDeal === "Y" ) {
+            $arrElements = $statItems->getItemsWithOutDeal();
+        }
+
+        $userID = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
 
         // If in module settings checked one of options
         if ( $bCreateLead === "Y" OR $bCreateDeal === "Y" ) {
@@ -137,6 +142,7 @@ class Cron  {
                 if ( $bCreateLead === "Y" ) {
 
                     $ID = $lid->addLead($item);
+                    $ownerType = "lead";
 
                     $arrUpdate = [
                         'lead' => $ID,
@@ -147,6 +153,7 @@ class Cron  {
                 if ( $bCreateDeal === "Y" ) {
 
                     $ID = $lid->addDeal($item);
+                    $ownerType = "deal";
 
                     $arrUpdate = [
                         'deal' => $ID,
@@ -172,7 +179,11 @@ class Cron  {
 
                         // Создадим Activity
                         $crmActivity = new \SmartCallBack\crmActivity( $userID, $phone, $dealID, $callId );
-                        $crmActivity->addActivity([$item['id_record_bx']], $duration);
+                        $crmActivity->addActivity   (
+                                                    [$item['id_record_bx']],
+                                                    $duration,
+                                                    $ownerType
+                                                    );
 
                     } catch (Exception $e) {
                         file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, " Something went wrong while creating a Call");
@@ -200,7 +211,7 @@ class Cron  {
                 $file_name = basename($elem["record_url"]); // get file name from url
                 $pathToFile = $_SERVER['DOCUMENT_ROOT'] . \SmartCallBack\downloadItems::downloadDir . $file_name;
 
-                $storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId($userID);
+                $storage = Driver::getInstance()->getStorageByUserId($userID);
                 $folder = $storage->getRootObject();
 
                 if ( $folder ) {
@@ -223,16 +234,9 @@ class Cron  {
 
                             $statItems->updateItem( $elem['id'], $arrUpdate );
                         }
-
                     }
-
                 }
             }
-
         }
-
     }
-
-
-
 }
