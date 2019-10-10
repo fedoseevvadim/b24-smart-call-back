@@ -46,6 +46,11 @@ class smartcallback extends CModule {
 
         \CAgent::AddAgent("\SmartCallBack\Cron::writeItems();", $this->MODULE_ID, $period= "Y", $this->executeTime, "", "Y", "","", $this->userId );
         \CAgent::AddAgent("\SmartCallBack\Cron::downloadItems();", $this->MODULE_ID, $period= "Y", $this->executeTime, "", "Y", $dateTime,"", $this->userId );
+        \CAgent::AddAgent("\SmartCallBack\Cron::createObj();", $this->MODULE_ID, $period= "Y", $this->executeTime, "", "Y", $dateTime,"", $this->userId );
+        \CAgent::AddAgent("\SmartCallBack\Cron::writeCallsToB24();", $this->MODULE_ID, $period= "Y", $this->executeTime, "", "Y", $dateTime,"", $this->userId );
+
+//        \COption::GetOptionString($this->MODULE_ID, "CLIENT_TOKEN");
+//        \COption::GetOptionString($this->MODULE_ID, "CLIENT_TOKEN");
 
         if($this->errors !== false)
         {

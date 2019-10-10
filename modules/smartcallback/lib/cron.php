@@ -13,6 +13,8 @@ class Cron  {
     const dateFormat = "d.m.Y H:i:s"; // for log files
     const pathToLog = "/local/modules/smartcallback/error.log"; //
 
+    public $userId = 1; // by default
+
     function __construct() {
 
 //        $this->date_to    = time();
@@ -114,46 +116,71 @@ class Cron  {
      * creating lids in CRM system B24
      *
      */
-    public static function createLids () {
+    public static function createObj () {
 
         $statItems  = new statItems();
         $lid        = new LID();
-        $arrElements = $statItems->getItemsWithOutLid();
+        $arrElements = $statItems->getItemsWithOutLead();
 
-        foreach ( $arrElements as $item ) {
+        $bCreateLead  = \COption::GetOptionString(Struct::moduleID, "CREATE_LEAD");
+        $bCreateDeal  = \COption::GetOptionString(Struct::moduleID, "CREATE_DEAL");
 
-            // TODO
-            // Нужно дописать код который будет проверять если такой лид по номеру телефона
+        $userID       = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
 
-            $lidID = $lid->addDeal($item);
+        // If in module settings checked one of options
+        if ( $bCreateLead === "Y" OR $bCreateDeal === "Y" ) {
 
-            if ( $lidID > 0 ) {
+            foreach ( $arrElements as $item ) {
 
-                $arrUpdate = [
-                    'lid' => $lidID,
-                ];
+                $ID = $lid->checkIfExist($item['phone']);
 
-                $statItems->updateItem($item['id'], $arrUpdate);
+                if ( $bCreateLead === "Y" ) {
 
-                $userID     = 1;
-                $phone      = $item['phone'];
-                $dealID     = $lidID;
-                $duration   = $item['duration'];
+                    $ID = $lid->addLead($item);
 
-                // Создадим звонок
-                $VIcall = new VICall( $userID, $phone, $dealID );
-                $ID     = $VIcall->createCall($duration, $dealID);
-                $callId = $VIcall->callID; // Получим ID звонка
+                    $arrUpdate = [
+                        'lead' => $ID,
+                    ];
 
-                // Создадим Activity
-                $crmActivity = new \SmartCallBack\crmActivity( $userID, $phone, $dealID, $callId );
-                $crmActivity->addActivity([$item['id_record_bx']], $duration);
+                }
 
+                if ( $bCreateDeal === "Y" ) {
+
+                    $ID = $lid->addDeal($item);
+
+                    $arrUpdate = [
+                        'deal' => $ID,
+                    ];
+
+                }
+
+                if ( $ID > 0 ) {
+
+                    try {
+
+                        $statItems->updateItem($item['id'], $arrUpdate);
+
+                        $userID     = $userID;
+                        $phone      = $item['phone'];
+                        $dealID     = $ID;
+                        $duration   = $item['duration'];
+
+                        // Create a call
+                        $VIcall = new VICall( $userID, $phone, $dealID );
+                        $ID     = $VIcall->createCall($duration, $dealID);
+                        $callId = $VIcall->callID; // Получим ID звонка
+
+                        // Создадим Activity
+                        $crmActivity = new \SmartCallBack\crmActivity( $userID, $phone, $dealID, $callId );
+                        $crmActivity->addActivity([$item['id_record_bx']], $duration);
+
+                    } catch (Exception $e) {
+                        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, " Something went wrong while creating a Call");
+                    }
+
+                }
             }
-
-
         }
-
     }
 
 
@@ -162,8 +189,9 @@ class Cron  {
     */
     public function writeCallsToB24() {
 
-        $statItems  = new statItems();
-        $arrElements = $statItems->getWroteCalls();
+        $statItems      = new statItems();
+        $arrElements    = $statItems->getWroteCalls();
+        $userID         = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
 
         foreach ( $arrElements as $elem ) {
 
@@ -172,15 +200,15 @@ class Cron  {
                 $file_name = basename($elem["record_url"]); // get file name from url
                 $pathToFile = $_SERVER['DOCUMENT_ROOT'] . \SmartCallBack\downloadItems::downloadDir . $file_name;
 
-                $storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId(1);
+                $storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId($userID);
                 $folder = $storage->getRootObject();
 
-                if ($folder) {
+                if ( $folder ) {
 
-                    if ($storage) {
+                    if ( $storage ) {
 
                         $fileArray  = \CFile::MakeFileArray($pathToFile);
-                        $arrData    = ['CREATED_BY' => 1];
+                        $arrData    = ['CREATED_BY' => $userID];
 
                         $file = $folder->uploadFile($fileArray, $arrData);
 

@@ -141,10 +141,10 @@ class statItems extends StatTable {
     }
 
     /**
-     * get items with out lid
+     * get items with out liad
      *
      */
-    public function getItemsWithOutLid () {
+    public function getItemsWithOutLead () {
 
         $arrItems = [];
 
@@ -152,7 +152,7 @@ class statItems extends StatTable {
             'select' => [ '*' ],
             'filter' => [
                             '=record_written' => 1,
-                            '=lid' => 0,
+                            '=lead' => 0,
                             '!=id_record_bx' => 0,
                         ],
             'limit' => $this->_limitFilesToDownload,
@@ -177,7 +177,7 @@ class statItems extends StatTable {
             'select' => [ '*' ],
             'filter' => [
                 '=record_written' => 1,
-                '=lid' => 0,
+                '=lead' => 0,
                 '=id_record_bx' => 0,
                 '!=record_url' => 'NULL'
             ],

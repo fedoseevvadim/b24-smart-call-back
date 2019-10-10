@@ -14,8 +14,30 @@ if($POST_RIGHT>="R") :
         array("API_TOKEN",                      GetMessage("API_TOKEN"),                        array("text", 25)),
         array("API_SIGNATURE",                  GetMessage("API_SIGNATURE"),                    array("text", 25)),
 
+        GetMessage("TYPE_OF_OBJECT_TO_CREATE"),
+
+        array("CREATE_LEAD",                    GetMessage("CREATE_LEAD"),                      array("checkbox")),
+        array("CREATE_DEAL",                    GetMessage("CREATE_DEAL"),                      array("checkbox")),
+
+        GetMessage("MAIN_USER"),
+
+        array("MAIN_USER_OPTION",               GetMessage("MAIN_USER_OPTION"),                 array("text", 5)),
+
+
+        GetMessage("LINK_TO_FIELDS"),
+
+        array("UTM_SOURCE",                   GetMessage("UTM_SOURCE"),                         array("text", 25)),
+        array("UTM_MEDIUM",                   GetMessage("UTM_MEDIUM"),                         array("text", 25)),
+        array("UTM_CAMPAIGN",                 GetMessage("UTM_CAMPAIGN"),                       array("text", 25)),
+        array("UTM_TERM",                     GetMessage("UTM_TERM"),                           array("text", 25)),
+        array("UTM_CONTENT",                  GetMessage("UTM_CONTENT"),                        array("text", 25)),
+        array("UTM_UPDATED",                  GetMessage("UTM_UPDATED"),                        array("text", 25)),
+
+
+        GetMessage("LINK_TO_FIELDS"),
 
     );
+
     $aTabs = array(
         array("DIV" => "edit1", "TAB" => GetMessage("MAIN_TAB_SET"), "ICON" => "subscribe_settings", "TITLE" => GetMessage("MAIN_TAB_TITLE_SET")),
         array("DIV" => "edit2", "TAB" => GetMessage("MAIN_TAB_RIGHTS"), "ICON" => "subscribe_settings", "TITLE" => GetMessage("MAIN_TAB_TITLE_RIGHTS")),

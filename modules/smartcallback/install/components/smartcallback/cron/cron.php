@@ -21,8 +21,8 @@ if ( CModule::IncludeModule("smartcallback")) {
 
     //if ( CModule::IncludeModule("voximplant")) {
 
-        SmartCallBack\Cron::createLids();
-        SmartCallBack\Cron::writeCallsToB24();
+//        SmartCallBack\Cron::createObj();
+//        SmartCallBack\Cron::writeCallsToB24();
 
 //        $storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId(1);
 //
@@ -37,7 +37,7 @@ if ( CModule::IncludeModule("smartcallback")) {
 
 
 
-        $res = \Bitrix\Disk\Internals\StorageTable::add($storage);
+        //$res = \Bitrix\Disk\Internals\StorageTable::add($storage);
 
 //        $userID = 1;
 //        $phone = "79152955011";

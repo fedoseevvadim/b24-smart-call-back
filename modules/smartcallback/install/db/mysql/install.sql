@@ -17,7 +17,8 @@ create table if not exists scb_stat
   `record_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `duration` int(5) DEFAULT '0',
   `record_written` int(1) DEFAULT '0',
-  `lid` int(11) DEFAULT '0',
+  `lead` int(11) DEFAULT '0',
+  `deal` int(11) DEFAULT '0',
   `id_record_bx` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
 );

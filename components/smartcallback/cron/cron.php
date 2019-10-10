@@ -21,7 +21,7 @@ if ( CModule::IncludeModule("smartcallback")) {
 
     if ( CModule::IncludeModule("voximplant")) {
 
-        SmartCallBack\Cron::createLids();
+        SmartCallBack\Cron::createObj();
         SmartCallBack\Cron::writeCallsToB24();
 
 //        $userID = 1;
