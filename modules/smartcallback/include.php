@@ -14,7 +14,7 @@ use Bitrix\Main\Loader;
         'SmartCallBack\Lead' => 'lib/Lead.php',
         'SmartCallBack\Deal' => 'lib/Deal.php',
         'SmartCallBack\VICall' => 'lib/VICall.php',
-        'SmartCallBack\CrmActivity' => 'lib/CrmActivity.php',
+        'SmartCallBack\CRMActivity' => 'lib/CRMActivity.php',
         'SmartCallBack\CRMStruct' => 'lib/CRMStruct.php',
         'SmartCallBack\CRMObject' => 'lib/CRMObject.php',
     )

@@ -153,6 +153,7 @@ class StatItems extends StatTable {
             'filter' => [
                             '=record_written' => 1,
                             '=lead' => 0,
+                            '!=record_url' => '',
                             '!=id_record_bx' => 0,
                         ],
             'limit' => $this->_limitFilesToDownload,
@@ -178,6 +179,7 @@ class StatItems extends StatTable {
             'filter' => [
                 '=record_written' => 1,
                 '=deal' => 0,
+                '!=record_url' => '',
                 '!=id_record_bx' => 0,
             ],
             'limit' => $this->_limitFilesToDownload,
@@ -204,7 +206,7 @@ class StatItems extends StatTable {
                 '=record_written' => 1,
                 '=lead' => 0,
                 '=id_record_bx' => 0,
-                '!=record_url' => 'NULL'
+                '!=record_url' => ''
             ],
             'limit' => $this->_limitFilesToDownload,
         ]);

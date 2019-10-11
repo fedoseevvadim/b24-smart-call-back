@@ -2,8 +2,7 @@
 
 namespace SmartCallBack;
 
-
-class CrmActivity extends \CCrmActivity{
+class CRMActivity extends \CCrmActivity{
 
     private $_userId;
     private $_phone;
@@ -105,6 +104,27 @@ class CrmActivity extends \CCrmActivity{
         }
 
         return $return;
+
+    }
+
+    public function addCallAndActivity ($ownerType, $item) {
+
+        $userID     = $this->_userId;
+        $phone      = $this->_phone;
+        $dealID     = $this->_dealID;
+        $duration   = $item['duration'];
+
+        // Create a call
+        $VIcall = new VICall( $userID, $phone, $dealID );
+        $ID     = $VIcall->createCall($duration, $dealID);
+        $callId = $VIcall->callID; // Получим ID звонка
+
+        // Создадим Activity
+        $this->addActivity   (
+            [$item['id_record_bx']],
+            $duration,
+            $ownerType
+        );
 
     }
 

@@ -16,8 +16,8 @@ if($POST_RIGHT>="R") :
 
         GetMessage("TYPE_OF_OBJECT_TO_CREATE"),
 
-        array("CREATE_LEAD",                    GetMessage("CREATE_LEAD"),                      array("checkbox")),
-        array("CREATE_DEAL",                    GetMessage("CREATE_DEAL"),                      array("checkbox")),
+        array("CREATE_LEAD",                    GetMessage("CREATE_LEAD"),                      array("radio", "CREATE_LEAD")),
+        array("CREATE_DEAL",                    GetMessage("CREATE_DEAL"),                      array("radio", "CREATE_DEAL")),
 
         GetMessage("MAIN_USER"),
 
@@ -32,9 +32,6 @@ if($POST_RIGHT>="R") :
         array("UTM_TERM",                     GetMessage("UTM_TERM"),                           array("text", 25)),
         array("UTM_CONTENT",                  GetMessage("UTM_CONTENT"),                        array("text", 25)),
         array("UTM_UPDATED",                  GetMessage("UTM_UPDATED"),                        array("text", 25)),
-
-
-        GetMessage("LINK_TO_FIELDS"),
 
     );
 
@@ -83,6 +80,17 @@ if($POST_RIGHT>="R") :
                 if($arOption[2][0] == "checkbox" && $val <> "Y")
                     $val = "N";
 
+                if($arOption[2][0] == "radio" ) {
+
+                    if ( $arOption[0] === $_POST["crmObject"] ) {
+                        $val = "Y";
+                    } else {
+                        $val = "N";
+                    }
+
+                }
+
+
                 if($name != "mail_additional_parameters" || $USER->IsAdmin())
                     COption::SetOptionString($module_id, $name, $val);
             }
@@ -130,6 +138,13 @@ if($POST_RIGHT>="R") :
                         if($type[0]=="checkbox")
                         {
                             ?><input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0])?>" id="<?echo htmlspecialcharsbx($Option[0])?>" value="Y"<?if($val=="Y")echo" checked";?>><?
+                        }
+                        elseif($type[0]=="radio") {
+                            ?>
+
+                            <input type="radio" name="crmObject" value="<?echo htmlspecialcharsbx($Option[0])?>" value="Y"<?if($val=="Y")echo" checked";?>>
+
+                            <?
                         }
                         elseif($type[0]=="text")
                         {

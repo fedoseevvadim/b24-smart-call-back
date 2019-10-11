@@ -23,6 +23,10 @@ class Cron  {
 
     }
 
+//    private function getOption($name) {
+//        return \COption::GetOptionString(Struct::moduleID, $name);
+//    }
+
     /**
      * Task for cron write items into database
      *
@@ -41,12 +45,17 @@ class Cron  {
             "date_to"   => $date_to,
         );
 
+
         // get API, TOKEN, SIGNATURE
+        //$arrModuleSettings = ['CLIENT_TOKEN', 'API_TOKEN', 'API_SIGNATURE'];
+        //list ( $CLIENT_TOKEN, $API_TOKEN, $API_SIGNATURE ) = self::getOption($arrModuleSettings);
+
+        //list($CLIENT_TOKEN, $API_TOKEN, $API_SIGNATURE) =
         $CLIENT_TOKEN   = \COption::GetOptionString(Struct::moduleID, "CLIENT_TOKEN");
         $API_TOKEN      = \COption::GetOptionString(Struct::moduleID, "API_TOKEN");
         $API_SIGNATURE  = \COption::GetOptionString(Struct::moduleID, "API_SIGNATURE");
 
-        if ( strlen( $CLIENT_TOKEN ) > 0 AND strlen ( $API_TOKEN ) > 0 AND strlen( $API_SIGNATURE ) > 0 ) {
+        if ( $CLIENT_TOKEN AND $API_TOKEN AND $API_SIGNATURE ) {
 
             try {
 
@@ -121,16 +130,17 @@ class Cron  {
         $lead        = new Lead;
         $deal        = new Deal;
 
-
         $bCreateLead  = \COption::GetOptionString(Struct::moduleID, "CREATE_LEAD");
         $bCreateDeal  = \COption::GetOptionString(Struct::moduleID, "CREATE_DEAL");
 
         if ( $bCreateLead === "Y" ) {
             $arrElements = $statItems->getItemsWithOutLead();
+            $ownerType = "lead";
         }
 
         if ( $bCreateDeal === "Y" ) {
             $arrElements = $statItems->getItemsWithOutDeal();
+            $ownerType = "deal";
         }
 
         $userID = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
@@ -140,53 +150,54 @@ class Cron  {
 
             foreach ( $arrElements as $item ) {
 
-                $ID = $lead->checkIfExist($item['phone']);
+                $arrElem = $lead->checkIfExist($item['phone']); // Search element lead or deal with that phone number
 
-                if ( $bCreateLead === "Y" ) {
+                if ( count($arrElem) > 0 ) {
 
-                    $ID = $lead->add($item);
-                    $ownerType = "lead";
+                    foreach ( $arrElem as $lead ) {
 
-                    $arrUpdate = [
-                        'lead' => $ID,
-                    ];
+                        $arrUpdate = [
+                            'lead' => $lead['ID'],
+                        ];
 
+                        $statItems->updateItem( $item['id'], $arrUpdate );
+
+                        $crmActivity = new CRMActivity($userID, $item['phone'], $lead['ID'], $ownerType);
+                        $crmActivity->addCallAndActivity($ownerType, $item);
+
+                    }
+
+                } else {
+
+                    if ( $bCreateLead === "Y" ) {
+
+                        $ID = $lead->add($item);
+
+                        $arrUpdate = [
+                            'lead' => $ID,
+                        ];
+
+                    }
+
+                    if ( $bCreateDeal === "Y" ) {
+
+                        $ID = $deal->add($item);
+
+                        $arrUpdate = [
+                            'deal' => $ID,
+                        ];
+
+                    }
                 }
 
-                if ( $bCreateDeal === "Y" ) {
-
-                    $ID = $deal->add($item);
-                    $ownerType = "deal";
-
-                    $arrUpdate = [
-                        'deal' => $ID,
-                    ];
-
-                }
 
                 if ( $ID > 0 ) {
 
                     try {
 
                         $statItems->updateItem($item['id'], $arrUpdate);
-
-                        $userID     = $userID;
-                        $phone      = $item['phone'];
-                        $dealID     = $ID;
-                        $duration   = $item['duration'];
-
-                        // Create a call
-                        $VIcall = new VICall( $userID, $phone, $dealID );
-                        $ID     = $VIcall->createCall($duration, $dealID);
-                        $callId = $VIcall->callID; // Получим ID звонка
-
-                        // Создадим Activity
-                        $crmActivity = new \SmartCallBack\CrmActivity( $userID, $phone, $dealID, $callId );
-                        $crmActivity->addActivity   (
-                                                    [$item['id_record_bx']],
-                                                    $duration,
-                                                    $ownerType
-                                                    );
+                        $crmActivity = new CRMActivity($userID, $item['phone'], $ID, $ownerType);
+                        $crmActivity->addCallAndActivity($ownerType, $item);
 
                     } catch (Exception $e) {
                         file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, " Something went wrong while creating a Call");
@@ -200,13 +211,13 @@ class Cron  {
     }
 
 
-    public function writeCallsToB24_2() {
-
-        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test2");
-
-        return "\SmartCallBack\Cron::writeCallsToB24_2();";
-
-    }
+//    public function writeCallsToB24_2() {
+//
+//        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test2");
+//
+//        return "\SmartCallBack\Cron::writeCallsToB24_2();";
+//
+//    }
 
     /**
     * write call to B24

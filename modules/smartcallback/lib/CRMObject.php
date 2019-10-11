@@ -2,16 +2,14 @@
 
 namespace SmartCallBack;
 
-use Bitrix\Crm\LeadTable;
-use Bitrix\Crm\DealTable;
-//use SmartCallBack\CRMStruct;
+use Bitrix\Crm\LeadTable,
+    Bitrix\Crm\DealTable,
+    Bitrix\Crm\FieldMultiTable;
 
 class CRMObject  {
 
     public $arrStruct = [];
-    public $opened    = "Y";
-    public $isNew     = "Y";
-
+    public $mainClassObject;
 
     function __construct() {
 
@@ -23,22 +21,18 @@ class CRMObject  {
         $this->arrStruct["utm_updated"]     = \COption::GetOptionString(Struct::moduleID, "UTM_UPDATED");
         $this->arrStruct["PHONE_WORK"]      = "phone";
 
-
     }
 
 
     public function addObject ( array $array, $class ): int {
 
         $arrStruct  = $this->getStruct();
-        //$arrStruct["WORK_PHONE"] = $array['phone'];
         $arrStruct["HAS_PHONE"] = "Y";
-
-        //$arrmap     = array_intersect_key($array, $this->arrStruct);
-        //$array      = array_merge($arrStruct, $arrmap);
-
+        $iPhone = $array['phone'];
         $array = $arrStruct;
+        //$array = array_merge($array, $arrStruct);
 
-        $array["TITLE"] = str_replace("[PHONE_NUMBER]", $array['phone'], $this->_title); // replace [PHONE_NUMBER] title with real phone;
+        $array["TITLE"] = str_replace("[PHONE_NUMBER]", $array['phone'], $this->title); // replace [PHONE_NUMBER] title with real phone;
         $res = $class::add( $array );
 
         if ($res->isSuccess()) {
@@ -50,7 +44,7 @@ class CRMObject  {
                 "TYPE_ID"       => "PHONE",
                 "VALUE_TYPE"    => "WORK",
                 "COMPLEX_ID"    => "PHONE_WORK",
-                "VALUE"         => $array['phone']
+                "VALUE"         => $iPhone
             ];
 
             \Bitrix\Crm\FieldMultiTable::add($arrMT);
@@ -64,13 +58,13 @@ class CRMObject  {
     }
 
     /**
-    * Check existence of object
-    *
-    * @param phone
-    */
+     * Check existence of object
+     *
+     * @param phone
+     */
     public function checkIfExist ( int $phone ): array {
 
-        $arLeads = \Bitrix\Crm\LeadTable::getList([
+        $arLeads = $this->mainClassObject::getList([
             "filter" => array("PHONE" => $phone)
         ])->fetchAll();
 

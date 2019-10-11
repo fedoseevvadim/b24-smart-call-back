@@ -49,8 +49,8 @@ if ( CModule::IncludeModule("smartcallback")) {
 //        $callId = $VIcall->callID; // Получим ID звонка
 //
 //        // Создадим Activity
-//        $CrmActivity = new \SmartCallBack\CrmActivity( $userID, $phone, $dealID, $callId );
-//        $CrmActivity->addActivity([103], $duration);
+//        $CRMActivity = new \SmartCallBack\CRMActivity( $userID, $phone, $dealID, $callId );
+//        $CRMActivity->addActivity([103], $duration);
 
 
     //}

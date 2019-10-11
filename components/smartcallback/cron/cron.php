@@ -24,40 +24,4 @@ if ( CModule::IncludeModule("smartcallback")) {
     \SmartCallBack\Cron::createObj();
     \SmartCallBack\Cron::writeCallsToB24();
 
-    //if ( CModule::IncludeModule("voximplant")) {
-
-//        SmartCallBack\Cron::createObj();
-//        SmartCallBack\Cron::writeCallsToB24();
-
-//        $storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId(1);
-//
-//        if ($storage) {
-//            $fileArray = \CFile::MakeFileArray($_SERVER['DOCUMENT_ROOT'].'/test.jpg');
-//
-//            $file = $folder->uploadFile($fileArray, array(
-//                'CREATED_BY' => 1
-//            ));
-//
-//        }
-
-
-
-        //$res = \Bitrix\Disk\Internals\StorageTable::add($storage);
-
-//        $userID = 1;
-//        $phone = "79152955011";
-//        $dealID = 41;
-//        $duration = 144;
-//        // Создадим звонок
-//        $VIcall = new VICall( $userID, $phone, $dealID );
-//        $ID     = $VIcall->createCall($duration, $dealID);
-//        $callId = $VIcall->callID; // Получим ID звонка
-//
-//        // Создадим Activity
-//        $CrmActivity = new \SmartCallBack\CrmActivity( $userID, $phone, $dealID, $callId );
-//        $CrmActivity->addActivity([103], $duration);
-
-
-    //}
-
 }

@@ -14,8 +14,6 @@ use Bitrix\Main\Type\DateTime;
 class Lead extends CRMObject implements CRMStruct {
 
     public $title       = "Новый лид по звонку с [PHONE_NUMBER] из SmartCallBack";
-    public $stage       = "C4:NEW";
-    public $category    = 4;
 
     public $mainClassObject = "\Bitrix\Crm\LeadTable";
 
@@ -25,22 +23,14 @@ class Lead extends CRMObject implements CRMStruct {
     */
     public function getStruct (): array {
 
-        return [
-                "DATE_CREATE"       => new DateTime(),
-                "DATE_MODIFY"       => new DateTime(),
-                "CREATED_BY_ID"     => Struct::userId,
-                "MODIFY_BY_ID"      => Struct::userId,
-                "ASSIGNED_BY_ID"    => Struct::userId,
-                "STAGE_SEMANTIC_ID" => P,
-                "IS_NEW"            => $this->isNew,
-                "COMPANY_ID"        => 0,
-                "OPENED"            => $this->opened,
-                "CATEGORY_ID"       => $this->category,
-                "STAGE_ID"          => $this->stage,
+        $arrStruct = [
+            "STATUS_ID"             => "NEW",
+            "STATUS_SEMANTIC_ID"    => "P"
+        ];
 
-                "STATUS_ID"             => "NEW",
-                "STATUS_SEMANTIC_ID"    => "P"
-            ];
+        $arrBaseStruct = Struct::getCrmStruct();
+
+        return array_merge($arrStruct, $arrBaseStruct);
 
     }
 
@@ -55,5 +45,7 @@ class Lead extends CRMObject implements CRMStruct {
         return $this->addObject ( $array, $this->mainClassObject );
 
     }
+
+
 
 }
