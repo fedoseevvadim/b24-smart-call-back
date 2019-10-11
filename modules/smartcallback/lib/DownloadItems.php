@@ -2,7 +2,7 @@
 
 namespace SmartCallBack;
 
-class downloadItems {
+class DownloadItems {
 
     const downloadDir = "/upload/scb/"; // dir for saving data from SCB as mp3 files
     private $_chunk_size = 1024*1024;

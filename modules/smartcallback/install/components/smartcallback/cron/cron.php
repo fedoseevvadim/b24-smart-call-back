@@ -14,7 +14,7 @@ require( $_SERVER["DOCUMENT_ROOT"]. "/bitrix/modules/main/include/prolog_before.
 use SmartCallBack\API,
     SmartCallBack\Struct,
     SmartCallBack\Cron;
-use SmartCallBack\downloadItems;
+use SmartCallBack\DownloadItems;
 
 
 if ( CModule::IncludeModule("smartcallback")) {
@@ -49,8 +49,8 @@ if ( CModule::IncludeModule("smartcallback")) {
 //        $callId = $VIcall->callID; // Получим ID звонка
 //
 //        // Создадим Activity
-//        $crmActivity = new \SmartCallBack\crmActivity( $userID, $phone, $dealID, $callId );
-//        $crmActivity->addActivity([103], $duration);
+//        $CrmActivity = new \SmartCallBack\CrmActivity( $userID, $phone, $dealID, $callId );
+//        $CrmActivity->addActivity([103], $duration);
 
 
     //}

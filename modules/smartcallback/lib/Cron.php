@@ -11,6 +11,7 @@ class Cron  {
     public $date_from;
 
     const dateFormat = "d.m.Y H:i:s"; // for log files
+    const pathToLogStatus = "/local/modules/smartcallback/status.log"; //
     const pathToLog = "/local/modules/smartcallback/error.log"; //
 
     public $userId = 1; // by default
@@ -28,12 +29,12 @@ class Cron  {
      */
     public static function  writeItems() {
 
-        $statItems = new statItems();
+        $statItems = new StatItems();
 
         $date_to     = time();
         $date_from  = $date_to - ( Struct::resForLastDays * 24 * 60 * 60 ) ;
 
-        $result = file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, date(self::dateFormat) . " Start");
+        $result = file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, date(self::dateFormat) . " Start");
 
         $POST = Array(
             "date_from" => $date_from,
@@ -68,11 +69,11 @@ class Cron  {
             } catch ( Exception $e ) {
 
                 echo 'Caught exeption: ' . $e->getMessage();
-                file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, $e->getMessage());
+                file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, $e->getMessage());
             }
 
         } else {
-            file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "Empty Autorisation data, please check CLIENT_TOKEN, API_TOKEN, API_SIGNATURE");
+            file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, "Empty Autorisation data, please check CLIENT_TOKEN, API_TOKEN, API_SIGNATURE");
         }
 
         return "\SmartCallBack\Cron::writeItems();";
@@ -85,8 +86,8 @@ class Cron  {
      */
     public static function downloadItems() {
 
-        $download   = new downloadItems();
-        $statItems  = new statItems();
+        $download   = new DownloadItems();
+        $statItems  = new StatItems();
         $arrItems   = $statItems->getItemsToDownload();
 
         $arrUpdate = [
@@ -106,7 +107,7 @@ class Cron  {
             }
         }
 
-        return "\SmartCallBack\Cron::downloadItems();";
+        return "\SmartCallBack\Cron::DownloadItems();";
     }
 
 
@@ -116,8 +117,10 @@ class Cron  {
      */
     public static function createObj () {
 
-        $statItems  = new statItems();
-        $lid        = new LID();
+        $statItems  = new StatItems();
+        $lead        = new Lead;
+        $deal        = new Deal;
+
 
         $bCreateLead  = \COption::GetOptionString(Struct::moduleID, "CREATE_LEAD");
         $bCreateDeal  = \COption::GetOptionString(Struct::moduleID, "CREATE_DEAL");
@@ -137,11 +140,11 @@ class Cron  {
 
             foreach ( $arrElements as $item ) {
 
-                $ID = $lid->checkIfExist($item['phone']);
+                $ID = $lead->checkIfExist($item['phone']);
 
                 if ( $bCreateLead === "Y" ) {
 
-                    $ID = $lid->addLead($item);
+                    $ID = $lead->add($item);
                     $ownerType = "lead";
 
                     $arrUpdate = [
@@ -152,7 +155,7 @@ class Cron  {
 
                 if ( $bCreateDeal === "Y" ) {
 
-                    $ID = $lid->addDeal($item);
+                    $ID = $deal->add($item);
                     $ownerType = "deal";
 
                     $arrUpdate = [
@@ -178,7 +181,7 @@ class Cron  {
                         $callId = $VIcall->callID; // Получим ID звонка
 
                         // Создадим Activity
-                        $crmActivity = new \SmartCallBack\crmActivity( $userID, $phone, $dealID, $callId );
+                        $crmActivity = new \SmartCallBack\CrmActivity( $userID, $phone, $dealID, $callId );
                         $crmActivity->addActivity   (
                                                     [$item['id_record_bx']],
                                                     $duration,
@@ -186,57 +189,79 @@ class Cron  {
                                                     );
 
                     } catch (Exception $e) {
-                        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, " Something went wrong while creating a Call");
+                        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, " Something went wrong while creating a Call");
                     }
 
                 }
             }
         }
+
+        return "\SmartCallBack\Cron::createObj();";
     }
 
+
+    public function writeCallsToB24_2() {
+
+        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test2");
+
+        return "\SmartCallBack\Cron::writeCallsToB24_2();";
+
+    }
 
     /**
     * write call to B24
     */
     public function writeCallsToB24() {
 
-        $statItems      = new statItems();
+        $statItems      = new StatItems();
         $arrElements    = $statItems->getWroteCalls();
         $userID         = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
 
+        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test3");
+
         foreach ( $arrElements as $elem ) {
 
-            if ( strlen($elem["record_url"]) > 0 ) {
+            if ( !$elem["record_url"] ) {
+                continue;
+            }
 
-                $file_name = basename($elem["record_url"]); // get file name from url
-                $pathToFile = $_SERVER['DOCUMENT_ROOT'] . \SmartCallBack\downloadItems::downloadDir . $file_name;
+            $file_name = basename($elem["record_url"]); // get file name from url
+            $pathToFile = $_SERVER['DOCUMENT_ROOT'] . \SmartCallBack\DownloadItems::downloadDir . $file_name;
+
+            try {
 
                 $storage = Driver::getInstance()->getStorageByUserId($userID);
                 $folder = $storage->getRootObject();
 
-                if ( $folder ) {
+                if ( !$folder OR !$storage ) {
 
-                    if ( $storage ) {
-
-                        $fileArray  = \CFile::MakeFileArray($pathToFile);
-                        $arrData    = ['CREATED_BY' => $userID];
-
-                        $file = $folder->uploadFile($fileArray, $arrData);
-
-                        $fileID = $file->getId();
-
-
-                        if ( $fileID > 0 ) {
-
-                            $arrUpdate = [
-                                'id_record_bx' => $fileID,
-                            ];
-
-                            $statItems->updateItem( $elem['id'], $arrUpdate );
-                        }
-                    }
+                    throw new Exception("Folder or storage folder does not exist");
                 }
+
+                $fileArray  = \CFile::MakeFileArray($pathToFile);
+                $arrData    = ['CREATED_BY' => $userID];
+
+                $file = $folder->uploadFile($fileArray, $arrData);
+
+                $fileID = $file->getId();
+
+
+                if ( $fileID > 0 ) {
+
+                    $arrUpdate = [
+                        'id_record_bx' => $fileID,
+                    ];
+
+                    $statItems->updateItem( $elem['id'], $arrUpdate );
+                }
+
+            } catch ( Exception $e ) {
+
+                file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, $e);
+
             }
         }
+
+        return "\SmartCallBack\Cron::writeCallsToB24();";
     }
 }

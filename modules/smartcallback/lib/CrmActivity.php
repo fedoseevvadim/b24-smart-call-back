@@ -3,7 +3,7 @@
 namespace SmartCallBack;
 
 
-class crmActivity extends \CCrmActivity{
+class CrmActivity extends \CCrmActivity{
 
     private $_userId;
     private $_phone;

@@ -9,20 +9,25 @@ define("BX_CRONTAB", true);
 define('BX_WITH_ON_AFTER_EPILOG', true);
 define('BX_NO_ACCELERATOR_RESET', true);
 
+echo $_SERVER["DOCUMENT_ROOT"];
+
 require( $_SERVER["DOCUMENT_ROOT"]. "/bitrix/modules/main/include/prolog_before.php" );
 
 use SmartCallBack\API,
     SmartCallBack\Struct,
     SmartCallBack\Cron;
-use SmartCallBack\downloadItems;
+use SmartCallBack\DownloadItems;
 
 
 if ( CModule::IncludeModule("smartcallback")) {
 
-    if ( CModule::IncludeModule("voximplant")) {
+    \SmartCallBack\Cron::createObj();
+    \SmartCallBack\Cron::writeCallsToB24();
 
-        SmartCallBack\Cron::createObj();
-        SmartCallBack\Cron::writeCallsToB24();
+    //if ( CModule::IncludeModule("voximplant")) {
+
+//        SmartCallBack\Cron::createObj();
+//        SmartCallBack\Cron::writeCallsToB24();
 
 //        $storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId(1);
 //
@@ -49,10 +54,10 @@ if ( CModule::IncludeModule("smartcallback")) {
 //        $callId = $VIcall->callID; // Получим ID звонка
 //
 //        // Создадим Activity
-//        $crmActivity = new \SmartCallBack\crmActivity( $userID, $phone, $dealID, $callId );
-//        $crmActivity->addActivity([103], $duration);
+//        $CrmActivity = new \SmartCallBack\CrmActivity( $userID, $phone, $dealID, $callId );
+//        $CrmActivity->addActivity([103], $duration);
 
 
-    }
+    //}
 
 }

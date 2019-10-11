@@ -2,10 +2,10 @@
 
 namespace SmartCallBack;
 
-class statItems extends StatTable {
+class StatItems extends StatTable {
 
     private $_statTable;
-    private $_limitFilesToDownload = 1;
+    private $_limitFilesToDownload = 10;
 
     public $date_to;
     public $date_from;

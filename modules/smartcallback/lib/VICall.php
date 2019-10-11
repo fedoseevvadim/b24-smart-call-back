@@ -4,6 +4,7 @@ namespace SmartCallBack;
 
 use \Bitrix\Voximplant\Call;
 
+\CModule::IncludeModule("voximplant");
 
 class VICall extends Call {
 
