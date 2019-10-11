@@ -2,9 +2,9 @@
 
 namespace SmartCallBack;
 
-use Bitrix\Crm\LeadTable,
-    Bitrix\Crm\DealTable,
-    Bitrix\Crm\FieldMultiTable;
+use \Bitrix\Crm\LeadTable,
+    \Bitrix\Crm\DealTable,
+    \Bitrix\Crm\FieldMultiTable;
 
 class CRMObject  {
 
@@ -32,7 +32,7 @@ class CRMObject  {
         $array = $arrStruct;
         //$array = array_merge($array, $arrStruct);
 
-        $array["TITLE"] = str_replace("[PHONE_NUMBER]", $array['phone'], $this->title); // replace [PHONE_NUMBER] title with real phone;
+        $array["TITLE"] = str_replace("[PHONE_NUMBER]", $iPhone, $this->title); // replace [PHONE_NUMBER] title with real phone;
         $res = $class::add( $array );
 
         if ($res->isSuccess()) {

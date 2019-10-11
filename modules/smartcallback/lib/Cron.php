@@ -2,7 +2,6 @@
 
 namespace SmartCallBack;
 
-use Protobuf\Exception;
 use \Bitrix\Disk\Driver;
 
 class Cron  {
@@ -228,7 +227,7 @@ class Cron  {
         $arrElements    = $statItems->getWroteCalls();
         $userID         = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
 
-        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test3");
+        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test6");
 
         foreach ( $arrElements as $elem ) {
 
@@ -241,7 +240,7 @@ class Cron  {
 
             try {
 
-                $storage = Driver::getInstance()->getStorageByUserId($userID);
+                $storage = \Driver::getInstance()->getStorageByUserId($userID);
                 $folder = $storage->getRootObject();
 
                 if ( !$folder OR !$storage ) {
@@ -267,7 +266,7 @@ class Cron  {
                 }
 
             } catch ( Exception $e ) {
-
+                echo $e;
                 file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, $e);
 
             }
