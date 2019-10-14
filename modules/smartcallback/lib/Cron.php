@@ -125,6 +125,11 @@ class Cron  {
      */
     public static function createObj () {
 
+        if ( !\CModule::IncludeModule("crm")) {
+            file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "Module crm is not installed");
+            return "\SmartCallBack\Cron::createObj();";
+        }
+
         $statItems  = new StatItems();
         $lead        = new Lead;
         $deal        = new Deal;
@@ -209,25 +214,21 @@ class Cron  {
         return "\SmartCallBack\Cron::createObj();";
     }
 
-
-//    public function writeCallsToB24_2() {
-//
-//        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test2");
-//
-//        return "\SmartCallBack\Cron::writeCallsToB24_2();";
-//
-//    }
-
     /**
     * write call to B24
     */
-    public function writeCallsToB24() {
+    public static function writeCallsToB24() {
+
+        if ( !\CModule::IncludeModule("disk")) {
+            file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "Module disk is not installed");
+            return "\SmartCallBack\Cron::writeCallsToB24();";
+        }
 
         $statItems      = new StatItems();
         $arrElements    = $statItems->getWroteCalls();
         $userID         = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
 
-        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test6");
+        //file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test1".$userID);
 
         foreach ( $arrElements as $elem ) {
 
@@ -240,7 +241,7 @@ class Cron  {
 
             try {
 
-                $storage = \Driver::getInstance()->getStorageByUserId($userID);
+                $storage = Driver::getInstance()->getStorageByUserId($userID);
                 $folder = $storage->getRootObject();
 
                 if ( !$folder OR !$storage ) {

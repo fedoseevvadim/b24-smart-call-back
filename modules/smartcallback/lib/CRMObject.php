@@ -64,6 +64,8 @@ class CRMObject  {
      */
     public function checkIfExist ( int $phone ): array {
 
+        //$arLeads = [];
+
         $arLeads = $this->mainClassObject::getList([
             "filter" => array("PHONE" => $phone)
         ])->fetchAll();
