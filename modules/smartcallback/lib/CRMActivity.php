@@ -119,6 +119,8 @@ class CRMActivity extends \CCrmActivity{
         $ID     = $VIcall->createCall($duration, $dealID);
         $callId = $VIcall->callID; // Получим ID звонка
 
+        $this->_callID = $callId;
+
         // Создадим Activity
         $this->addActivity   (
             [$item['id_record_bx']],

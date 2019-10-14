@@ -2,6 +2,9 @@
 
 namespace SmartCallBack;
 
+use Bitrix\Main\Application;
+use Bitrix\Main\Diag\Debug;
+
 use \Bitrix\Crm\LeadTable,
     \Bitrix\Crm\DealTable,
     \Bitrix\Crm\FieldMultiTable;
@@ -11,15 +14,22 @@ class CRMObject  {
     public $arrStruct = [];
     public $mainClassObject;
 
+    // Options in module, map fields via ID of lead or deal
+    public static $arrUtm = [
+        "UTM_SOURCE",
+        "UTM_MEDIUM",
+        "UTM_CAMPAIGN",
+        "UTM_TERM",
+        "UTM_CONTENT",
+        "UTM_UPDATED"
+    ];
+
+
     function __construct() {
 
-        $this->arrStruct["utm_source"]      = \COption::GetOptionString(Struct::moduleID, "UTM_SOURCE");
-        $this->arrStruct["utm_medium"]      = \COption::GetOptionString(Struct::moduleID, "UTM_MEDIUM");
-        $this->arrStruct["utm_campaign"]    = \COption::GetOptionString(Struct::moduleID, "UTM_CAMPAIGN");
-        $this->arrStruct["utm_term"]        = \COption::GetOptionString(Struct::moduleID, "UTM_TERM");
-        $this->arrStruct["utm_content"]     = \COption::GetOptionString(Struct::moduleID, "UTM_CONTENT");
-        $this->arrStruct["utm_updated"]     = \COption::GetOptionString(Struct::moduleID, "UTM_UPDATED");
-        $this->arrStruct["PHONE_WORK"]      = "phone";
+        foreach ( self::$arrUtm as $utm ) {
+            $this->arrStruct[$utm]      = \COption::GetOptionString(Struct::moduleID, $utm);
+        }
 
     }
 
@@ -29,7 +39,26 @@ class CRMObject  {
         $arrStruct  = $this->getStruct();
         $arrStruct["HAS_PHONE"] = "Y";
         $iPhone = $array['phone'];
+
+        // add utm marks
+        foreach ( $this->arrStruct as $keyS => $struct ) {
+
+            if ( $this->arrStruct[$keyS] ) {
+
+                $keyS = strtolower($keyS);
+
+                if ( array_key_exists($keyS, $array) ) {
+
+                    $arrStruct[$struct] = $array[$keyS];
+                }
+
+            }
+
+        }
+
+
         $array = $arrStruct;
+
         //$array = array_merge($array, $arrStruct);
 
         $array["TITLE"] = str_replace("[PHONE_NUMBER]", $iPhone, $this->title); // replace [PHONE_NUMBER] title with real phone;
@@ -63,8 +92,6 @@ class CRMObject  {
      * @param phone
      */
     public function checkIfExist ( int $phone ): array {
-
-        //$arLeads = [];
 
         $arLeads = $this->mainClassObject::getList([
             "filter" => array("PHONE" => $phone)

@@ -3,6 +3,7 @@
 namespace SmartCallBack;
 
 use \Bitrix\Disk\Driver;
+use Bitrix\Main\Diag\Debug;
 
 class Cron  {
 
@@ -10,8 +11,8 @@ class Cron  {
     public $date_from;
 
     const dateFormat = "d.m.Y H:i:s"; // for log files
-    const pathToLogStatus = "/local/modules/smartcallback/status.log"; //
-    const pathToLog = "/local/modules/smartcallback/error.log"; //
+    //const pathToLogStatus = "/local/modules/smartcallback/status.log"; //
+    //const pathToLog = "/local/modules/smartcallback/error.log"; //
 
     public $userId = 1; // by default
 
@@ -22,9 +23,6 @@ class Cron  {
 
     }
 
-//    private function getOption($name) {
-//        return \COption::GetOptionString(Struct::moduleID, $name);
-//    }
 
     /**
      * Task for cron write items into database
@@ -35,9 +33,9 @@ class Cron  {
         $statItems = new StatItems();
 
         $date_to     = time();
-        $date_from  = $date_to - ( Struct::resForLastDays * 24 * 60 * 60 ) ;
+        $date_from   = $date_to - ( Struct::resForLastDays * 24 * 60 * 60 ) ;
 
-        $result = file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, date(self::dateFormat) . " Start");
+        Struct::debug("Start");
 
         $POST = Array(
             "date_from" => $date_from,
@@ -77,11 +75,11 @@ class Cron  {
             } catch ( Exception $e ) {
 
                 echo 'Caught exeption: ' . $e->getMessage();
-                file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, $e->getMessage());
+                Struct::debug($e->getMessage());
             }
 
         } else {
-            file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, "Empty Autorisation data, please check CLIENT_TOKEN, API_TOKEN, API_SIGNATURE");
+            Struct::debug( "Empty Autorisation data, please check CLIENT_TOKEN, API_TOKEN, API_SIGNATURE" );
         }
 
         return "\SmartCallBack\Cron::writeItems();";
@@ -126,13 +124,13 @@ class Cron  {
     public static function createObj () {
 
         if ( !\CModule::IncludeModule("crm")) {
-            file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "Module crm is not installed");
+            Struct::debug("Module crm is not installed");
             return "\SmartCallBack\Cron::createObj();";
         }
 
         $statItems  = new StatItems();
-        $lead        = new Lead;
-        $deal        = new Deal;
+        $crmLead    = new Lead;
+        $crmDeal    = new Deal;
 
         $bCreateLead  = \COption::GetOptionString(Struct::moduleID, "CREATE_LEAD");
         $bCreateDeal  = \COption::GetOptionString(Struct::moduleID, "CREATE_DEAL");
@@ -154,7 +152,7 @@ class Cron  {
 
             foreach ( $arrElements as $item ) {
 
-                $arrElem = $lead->checkIfExist($item['phone']); // Search element lead or deal with that phone number
+                $arrElem = $crmLead->checkIfExist($item['phone']); // Search element lead or deal with that phone number
 
                 if ( count($arrElem) > 0 ) {
 
@@ -166,7 +164,7 @@ class Cron  {
 
                         $statItems->updateItem( $item['id'], $arrUpdate );
 
-                        $crmActivity = new CRMActivity($userID, $item['phone'], $lead['ID'], $ownerType);
+                        $crmActivity = new CRMActivity($userID, $item['phone'], $lead['ID'], $item['id_record_bx']);
                         $crmActivity->addCallAndActivity($ownerType, $item);
 
                     }
@@ -175,7 +173,7 @@ class Cron  {
 
                     if ( $bCreateLead === "Y" ) {
 
-                        $ID = $lead->add($item);
+                        $ID = $crmLead->add($item);
 
                         $arrUpdate = [
                             'lead' => $ID,
@@ -185,7 +183,7 @@ class Cron  {
 
                     if ( $bCreateDeal === "Y" ) {
 
-                        $ID = $deal->add($item);
+                        $ID = $crmDeal->add($item);
 
                         $arrUpdate = [
                             'deal' => $ID,
@@ -200,11 +198,11 @@ class Cron  {
                     try {
 
                         $statItems->updateItem($item['id'], $arrUpdate);
-                        $crmActivity = new CRMActivity($userID, $item['phone'], $ID, $ownerType);
+                        $crmActivity = new CRMActivity($userID, $item['phone'], $ID, $item['id_record_bx']);
                         $crmActivity->addCallAndActivity($ownerType, $item);
 
                     } catch (Exception $e) {
-                        file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLogStatus, " Something went wrong while creating a Call");
+                        Struct::debug("Something went wrong while creating a Call");
                     }
 
                 }
@@ -220,7 +218,7 @@ class Cron  {
     public static function writeCallsToB24() {
 
         if ( !\CModule::IncludeModule("disk")) {
-            file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "Module disk is not installed");
+            Struct::debug("Module disk is not installed");
             return "\SmartCallBack\Cron::writeCallsToB24();";
         }
 
@@ -267,9 +265,7 @@ class Cron  {
                 }
 
             } catch ( Exception $e ) {
-                echo $e;
-                file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, $e);
-
+                Struct::debug($e);
             }
         }
 
