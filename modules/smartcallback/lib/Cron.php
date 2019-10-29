@@ -252,17 +252,21 @@ class Cron  {
 
                 $file = $folder->uploadFile($fileArray, $arrData);
 
-                $fileID = $file->getId();
+                if ( $file ) {
 
+                    $fileID = $file->getId();
 
-                if ( $fileID > 0 ) {
+                    if ( $fileID > 0 ) {
 
-                    $arrUpdate = [
-                        'id_record_bx' => $fileID,
-                    ];
+                        $arrUpdate = [
+                            'id_record_bx' => $fileID,
+                        ];
 
-                    $statItems->updateItem( $elem['id'], $arrUpdate );
+                        $statItems->updateItem( $elem['id'], $arrUpdate );
+                    }
+
                 }
+
 
             } catch ( Exception $e ) {
                 Struct::debug($e);
