@@ -4,7 +4,7 @@ namespace SmartCallBack;
 
 class DownloadItems {
 
-    const downloadDir = "/upload/scb/"; // dir for saving data from SCB as mp3 files
+    const DOWNLOAD_DIR = "/upload/scb/"; // dir for saving data from SCB as mp3 files
     private $_chunk_size = 1024*1024;
 
     /**
@@ -16,7 +16,7 @@ class DownloadItems {
     public function download ( $link, $retbytes = TRUE ) {
 
         $file_name = basename($link);
-        $directory = $_SERVER['DOCUMENT_ROOT'].self::downloadDir;
+        $directory = $_SERVER['DOCUMENT_ROOT'].self::DOWNLOAD_DIR;
         $file = $directory . $file_name;
 
         if ( !is_dir ( $directory ) ){

@@ -18,7 +18,7 @@ use SmartCallBack\DownloadItems;
 
 
 if ( CModule::IncludeModule("smartcallback")) {
-
+    SmartCallBack\Cron::writeCallsToB24();
     //if ( CModule::IncludeModule("voximplant")) {
 
 //        SmartCallBack\Cron::createObj();

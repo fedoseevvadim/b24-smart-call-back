@@ -21,6 +21,8 @@ class Cron  {
 //        $this->date_to    = time();
 //        $this->date_from  = $this->date_to - ( Struct::resForLastDays * 24 * 60 * 60 ) ;
 
+
+
     }
 
 
@@ -33,7 +35,7 @@ class Cron  {
         $statItems = new StatItems();
 
         $date_to     = time();
-        $date_from   = $date_to - ( Struct::resForLastDays * 24 * 60 * 60 ) ;
+        $date_from   = $date_to - ( Struct::RES_FOR_LAST_DAYS * 24 * 60 * 60 ) ;
 
         Struct::debug("Start");
 
@@ -48,9 +50,9 @@ class Cron  {
         //list ( $CLIENT_TOKEN, $API_TOKEN, $API_SIGNATURE ) = self::getOption($arrModuleSettings);
 
         //list($CLIENT_TOKEN, $API_TOKEN, $API_SIGNATURE) =
-        $CLIENT_TOKEN   = \COption::GetOptionString(Struct::moduleID, "CLIENT_TOKEN");
-        $API_TOKEN      = \COption::GetOptionString(Struct::moduleID, "API_TOKEN");
-        $API_SIGNATURE  = \COption::GetOptionString(Struct::moduleID, "API_SIGNATURE");
+        $CLIENT_TOKEN   = \COption::GetOptionString(Struct::MODULE_ID, "CLIENT_TOKEN");
+        $API_TOKEN      = \COption::GetOptionString(Struct::MODULE_ID, "API_TOKEN");
+        $API_SIGNATURE  = \COption::GetOptionString(Struct::MODULE_ID, "API_SIGNATURE");
 
         if ( $CLIENT_TOKEN AND $API_TOKEN AND $API_SIGNATURE ) {
 
@@ -132,8 +134,8 @@ class Cron  {
         $crmLead    = new Lead;
         $crmDeal    = new Deal;
 
-        $bCreateLead  = \COption::GetOptionString(Struct::moduleID, "CREATE_LEAD");
-        $bCreateDeal  = \COption::GetOptionString(Struct::moduleID, "CREATE_DEAL");
+        $bCreateLead  = \COption::GetOptionString(Struct::MODULE_ID, "CREATE_LEAD");
+        $bCreateDeal  = \COption::GetOptionString(Struct::MODULE_ID, "CREATE_DEAL");
 
         if ( $bCreateLead === "Y" ) {
             $arrElements = $statItems->getItemsWithOutLead();
@@ -145,7 +147,7 @@ class Cron  {
             $ownerType = "deal";
         }
 
-        $userID = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
+        $userID = (int) \COption::GetOptionString(Struct::MODULE_ID, "MAIN_USER_OPTION");
 
         // If in module settings checked one of options
         if ( $bCreateLead === "Y" OR $bCreateDeal === "Y" ) {
@@ -224,9 +226,7 @@ class Cron  {
 
         $statItems      = new StatItems();
         $arrElements    = $statItems->getWroteCalls();
-        $userID         = (int) \COption::GetOptionString(Struct::moduleID, "MAIN_USER_OPTION");
-
-        //file_put_contents($_SERVER["DOCUMENT_ROOT"].self::pathToLog, "test1".$userID);
+        $userID         = (int) \COption::GetOptionString(Struct::MODULE_ID, "MAIN_USER_OPTION");
 
         foreach ( $arrElements as $elem ) {
 
@@ -235,11 +235,11 @@ class Cron  {
             }
 
             $file_name = basename($elem["record_url"]); // get file name from url
-            $pathToFile = $_SERVER['DOCUMENT_ROOT'] . \SmartCallBack\DownloadItems::downloadDir . $file_name;
+            $pathToFile = $_SERVER['DOCUMENT_ROOT'] . \SmartCallBack\DownloadItems::DOWNLOAD_DIR . $file_name;
 
             try {
 
-                $storage = Driver::getInstance()->getStorageByUserId($userID);
+                $storage = Driver::getInstance()->getStorageByUserId(Struct::USER_ID);
                 $folder = $storage->getRootObject();
 
                 if ( !$folder OR !$storage ) {
@@ -248,7 +248,7 @@ class Cron  {
                 }
 
                 $fileArray  = \CFile::MakeFileArray($pathToFile);
-                $arrData    = ['CREATED_BY' => $userID];
+                $arrData    = ['CREATED_BY' => Struct::USER_ID];
 
                 $file = $folder->uploadFile($fileArray, $arrData);
 

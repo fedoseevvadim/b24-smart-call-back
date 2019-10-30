@@ -28,7 +28,7 @@ class CRMObject  {
     function __construct() {
 
         foreach ( self::$arrUtm as $utm ) {
-            $this->arrStruct[$utm]      = \COption::GetOptionString(Struct::moduleID, $utm);
+            $this->arrStruct[$utm]      = \COption::GetOptionString(Struct::MODULE_ID, $utm);
         }
 
     }

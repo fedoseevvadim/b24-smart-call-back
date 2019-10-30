@@ -14,7 +14,7 @@ class StatItems extends StatTable {
     function __construct() {
 
         $this->date_to    = time();
-        $this->date_from  = $this->date_to - Struct::resForLastDays * 24 * 60 * 60 ;
+        $this->date_from  = $this->date_to - Struct::RES_FOR_LAST_DAYS * 24 * 60 * 60 ;
 
         $this->_statTable = new \SmartCallBack\StatTable;
         $this->getLastItems();
