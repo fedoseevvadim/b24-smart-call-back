@@ -10,7 +10,7 @@ final class Struct {
     const DEBUG = 1; // Set it to 0 if you do not want to write into a file in root dir __bx_log.log
 
     const MODULE_ID             = "smartcallback";
-    const RES_FOR_LAST_DAYS    = 30;             // get data for last XX days
+    const RES_FOR_LAST_DAYS    = 10;             // get data for last XX days
     const USER_ID               = 1;
     const CATEGORY              = 4;
     const COMPANY_ID            = 0;

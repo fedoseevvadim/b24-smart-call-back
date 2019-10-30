@@ -149,6 +149,10 @@ class Cron  {
 
         $userID = (int) \COption::GetOptionString(Struct::MODULE_ID, "MAIN_USER_OPTION");
 
+        if ( $userID === 0 ) {
+            $userID = Struct::USER_ID;
+        }
+
         // If in module settings checked one of options
         if ( $bCreateLead === "Y" OR $bCreateDeal === "Y" ) {
 
@@ -174,6 +178,10 @@ class Cron  {
                 } else {
 
                     if ( $bCreateLead === "Y" ) {
+
+                        $item["CREATED_BY_ID"]     = $userID;
+                        $item["MODIFY_BY_ID"]      = $userID;
+                        $item["ASSIGNED_BY_ID"]    = $userID;
 
                         $ID = $crmLead->add($item);
 

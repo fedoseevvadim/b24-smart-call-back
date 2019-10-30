@@ -38,6 +38,11 @@ class CRMObject  {
 
         $arrStruct  = $this->getStruct();
         $arrStruct["HAS_PHONE"] = "Y";
+
+        $arrStruct["CREATED_BY_ID"]     = $array["CREATED_BY_ID"];
+        $arrStruct["MODIFY_BY_ID"]      = $array["MODIFY_BY_ID"];
+        $arrStruct["ASSIGNED_BY_ID"]    = $array["ASSIGNED_BY_ID"];
+
         $iPhone = $array['phone'];
 
         // add utm marks
