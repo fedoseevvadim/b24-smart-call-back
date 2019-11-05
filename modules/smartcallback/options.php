@@ -32,7 +32,7 @@ if($POST_RIGHT>="R") :
         array("UTM_TERM",                     GetMessage("UTM_TERM"),                           array("text", 25)),
         array("UTM_CONTENT",                  GetMessage("UTM_CONTENT"),                        array("text", 25)),
         array("UTM_UPDATED",                  GetMessage("UTM_UPDATED"),                        array("text", 25)),
-        array("UTM_DOMAIN",                   GetMessage("UTM_DOMAIN"),                         array("text", 25)),
+        array("DOMEN",                        GetMessage("DOMEN"),                              array("text", 25)),
 
 
     );

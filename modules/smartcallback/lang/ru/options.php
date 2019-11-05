@@ -12,6 +12,7 @@ $MESS["UTM_CAMPAIGN"]   = "UTM_CAMPAIGN (Укажите ID поля из кар�
 $MESS["UTM_TERM"]       = "UTM_TERM (Укажите ID поля из карточки)";
 $MESS["UTM_CONTENT"]    = "UTM_CONTENT (Укажите ID поля из карточки)";
 $MESS["UTM_UPDATED"]    = "UTM_UPDATED (Укажите ID поля из карточки)";
+$MESS["DOMEN"]          = "DOMAIN (Укажите ID поля из карточки)";
 
 $MESS["TYPE_OF_OBJECT_TO_CREATE"]     = "Какой тип объекта создавать";
 $MESS["CREATE_LEAD"] = "Лид";

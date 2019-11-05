@@ -22,7 +22,7 @@ class CRMObject  {
         "UTM_TERM",
         "UTM_CONTENT",
         "UTM_UPDATED",
-        "DOMAIN"
+        "DOMEN"
     ];
 
 
