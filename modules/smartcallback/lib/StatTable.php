@@ -76,6 +76,11 @@ class StatTable extends Main\Entity\DataManager
                 'data_type' => 'integer',
                 'title' => Loc::getMessage('STAT_ENTITY_TYPE_ID_FIELD'),
             ),
+            'domen' => array(
+                'data_type' => 'string',
+                'validation' => array(__CLASS__, 'validateDomen'),
+                'title' => Loc::getMessage('STAT_ENTITY_DOMEN_FIELD'),
+            ),
             'type_title' => array(
                 'data_type' => 'string',
                 'validation' => array(__CLASS__, 'validateTypeTitle'),
@@ -159,6 +164,19 @@ class StatTable extends Main\Entity\DataManager
             new Main\Entity\Validator\Length(null, 255),
         );
     }
+
+    /**
+     * Returns validators for type_domen field.
+     *
+     * @return array
+     */
+    public static function validateDomen()
+    {
+        return array(
+            new Main\Entity\Validator\Length(null, 255),
+        );
+    }
+
     /**
      * Returns validators for type_title field.
      *

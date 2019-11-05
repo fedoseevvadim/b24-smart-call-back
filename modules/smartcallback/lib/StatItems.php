@@ -82,6 +82,7 @@ class StatItems extends StatTable {
                     "status_id"         => $item->status->code,
                     "status_title"      => $item->status->title,
                     "type_id"           => $item->type->code,
+                    "domen"             => $item->domen,
                     "type_title"        => $item->type->title,
                     "phone"             => $item->phone,
                     "date_create"       => $item->date_create,

@@ -5,6 +5,7 @@ create table if not exists scb_stat
   `status_id` int(1) DEFAULT '0',
   `status_title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `type_id` int(1) DEFAULT '0',
+  `domen` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `type_title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `phone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `date_create` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
