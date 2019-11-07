@@ -44,12 +44,6 @@ class Cron  {
             "date_to"   => $date_to,
         );
 
-
-        // get API, TOKEN, SIGNATURE
-        //$arrModuleSettings = ['CLIENT_TOKEN', 'API_TOKEN', 'API_SIGNATURE'];
-        //list ( $CLIENT_TOKEN, $API_TOKEN, $API_SIGNATURE ) = self::getOption($arrModuleSettings);
-
-        //list($CLIENT_TOKEN, $API_TOKEN, $API_SIGNATURE) =
         $CLIENT_TOKEN   = \COption::GetOptionString(Struct::MODULE_ID, "CLIENT_TOKEN");
         $API_TOKEN      = \COption::GetOptionString(Struct::MODULE_ID, "API_TOKEN");
         $API_SIGNATURE  = \COption::GetOptionString(Struct::MODULE_ID, "API_SIGNATURE");
@@ -168,20 +162,49 @@ class Cron  {
                             'lead' => $lead['ID'],
                         ];
 
-                        $statItems->updateItem( $item['id'], $arrUpdate );
+                        $bxId = (int) $item['id_record_bx'];
 
-                        $crmActivity = new CRMActivity($userID, $item['phone'], $lead['ID'], $item['id_record_bx']);
-                        $crmActivity->addCallAndActivity($ownerType, $item);
+                        $bUpdateItem = false;
+
+                        if ( $bxId > 0 ) {
+                            $bUpdateItem = true;
+                        }
+
+                        if ( $item["record_url"] === null OR $item["record_url"] === "" ) {
+                            $bUpdateItem = true;
+                        }
+
+                        if ( $bUpdateItem === true ) {
+
+                            $statItems->updateItem( $item['id'], $arrUpdate );
+
+                            $crmActivity = new CRMActivity($userID, $item['phone'], $lead['ID'], $bxId);
+                            $crmActivity->addCallAndActivity($ownerType, $item);
+                        }
+
 
                     }
 
                 } else {
 
-                    if ( $bCreateLead === "Y" ) {
+                    $bCreateItem = false;
 
-                        $item["CREATED_BY_ID"]     = $userID;
-                        $item["MODIFY_BY_ID"]      = $userID;
-                        $item["ASSIGNED_BY_ID"]    = $userID;
+                    // if it is empty creating lead
+                    if ( $item["record_url"] === null OR $item["record_url"] === "" ) {
+                        $bCreateItem = true;
+                    } else { // else wait untill mp3 message will be write down on disk
+
+                        if ( $item["id_record_bx"] > 0 ) {
+                            $bCreateItem = true;
+                        }
+
+                    }
+
+                    $item["CREATED_BY_ID"]     = $userID;
+                    $item["MODIFY_BY_ID"]      = $userID;
+                    $item["ASSIGNED_BY_ID"]    = $userID;
+
+                    if ( $bCreateLead === "Y" AND $bCreateItem === true ) {
 
                         $ID = $crmLead->add($item);
 
@@ -189,15 +212,18 @@ class Cron  {
                             'lead' => $ID,
                         ];
 
+                        $statItems->updateItem($item['id'], $arrUpdate);
                     }
 
-                    if ( $bCreateDeal === "Y" ) {
+                    if ( $bCreateDeal === "Y" AND $bCreateItem === true ) {
 
                         $ID = $crmDeal->add($item);
 
                         $arrUpdate = [
                             'deal' => $ID,
                         ];
+
+                        $statItems->updateItem($item['id'], $arrUpdate);
 
                     }
                 }
@@ -207,9 +233,14 @@ class Cron  {
 
                     try {
 
-                        $statItems->updateItem($item['id'], $arrUpdate);
-                        $crmActivity = new CRMActivity($userID, $item['phone'], $ID, $item['id_record_bx']);
-                        $crmActivity->addCallAndActivity($ownerType, $item);
+                        $bxId = (int) $item['id_record_bx'];
+
+                        if ( $bxId > 0 ) {
+
+                            $crmActivity = new CRMActivity($userID, $item['phone'], $ID, $bxId);
+                            $crmActivity->addCallAndActivity($ownerType, $item);
+
+                        }
 
                     } catch (Exception $e) {
                         Struct::debug("Something went wrong while creating a Call");

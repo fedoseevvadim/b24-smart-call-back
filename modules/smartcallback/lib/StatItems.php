@@ -30,7 +30,9 @@ class StatItems extends StatTable {
         $res = $this->_statTable->getList([
 
             'select' => [
+                'id',
                 'query_id',
+                'record_url'
             ],
             'filter' => [
                 '>=date_create' => $this->date_from,
@@ -74,7 +76,9 @@ class StatItems extends StatTable {
      */
     public function writeItem ( $item ) {
 
-        if ( $this->checkIfItemIsExist($item->query_id) === false ) {
+        $id = $this->checkIfItemIsExist($item->query_id);
+
+        if ( $id === false ) {
 
             $res = $this->_statTable->add(
                 [
@@ -102,6 +106,24 @@ class StatItems extends StatTable {
                 print_r($res->getErrorMessages());
             }
 
+        } else {
+
+            $record_url = $this->lastItems[$id]["record_url"];
+
+            // update field "record_url" when only it is empty
+            if ( ( $record_url === null OR  $record_url === "" ) AND $item->record_url !== null ) {
+
+                $itemID = (int) $this->lastItems[$id]["id"];
+
+                $arrUpdate = [
+                    "record_url" => $item->record_url,
+                    "record_written" => 0
+                ];
+
+                $this->updateItem( $itemID, $arrUpdate );
+            }
+
+
         }
 
     }
@@ -111,7 +133,7 @@ class StatItems extends StatTable {
      *
      * @param $id integer - id of element
      */
-    public function updateItem ($id, $array) {
+    public function updateItem ( int $id, array $array ) {
 
         if ( $id > 0 ) {
 
@@ -135,7 +157,7 @@ class StatItems extends StatTable {
      *
      * @param integer $id
      */
-    public function checkIfItemIsExist ($id) {
+    public function checkIfItemIsExist ( int $id) {
 
         return array_search( $id,  array_column($this->lastItems, 'query_id') );
 
@@ -154,8 +176,8 @@ class StatItems extends StatTable {
             'filter' => [
                             '=record_written' => 1,
                             '=lead' => 0,
-                            '!=record_url' => '',
-                            '!=id_record_bx' => 0,
+                            //'!=record_url' => '',
+                            //'!=id_record_bx' => 0,
                         ],
             'limit' => $this->_limitFilesToDownload,
         ]);
@@ -180,8 +202,8 @@ class StatItems extends StatTable {
             'filter' => [
                 '=record_written' => 1,
                 '=deal' => 0,
-                '!=record_url' => '',
-                '!=id_record_bx' => 0,
+                //'!=record_url' => '',
+                //'!=id_record_bx' => 0,
             ],
             'limit' => $this->_limitFilesToDownload,
         ]);
@@ -218,6 +240,7 @@ class StatItems extends StatTable {
 
         return $arrItems;
     }
+
 
 }
 

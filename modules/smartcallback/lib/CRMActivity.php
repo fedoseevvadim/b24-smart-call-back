@@ -91,7 +91,7 @@ class CRMActivity extends \CCrmActivity{
 
     }
 
-    private function callDurationAsText ( $duration ) {
+    private function callDurationAsText ( int $duration ) {
 
         $return = "";
 
@@ -107,26 +107,30 @@ class CRMActivity extends \CCrmActivity{
 
     }
 
-    public function addCallAndActivity ($ownerType, $item) {
+    public function addCallAndActivity ( string $ownerType, array $item ) {
 
         $userID     = $this->_userId;
         $phone      = $this->_phone;
         $dealID     = $this->_dealID;
-        $duration   = $item['duration'];
+        $duration   = (int) $item['duration'];
 
-        // Create a call
-        $VIcall = new VICall( $userID, $phone, $dealID );
-        $ID     = $VIcall->createCall($duration, $dealID);
-        $callId = $VIcall->callID; // Получим ID звонка
+        if ( $duration > 0 ) {
 
-        $this->_callID = $callId;
+            // Create a call
+            $VIcall = new VICall( $userID, $phone, $dealID );
+            $ID     = $VIcall->createCall($duration, $dealID);
+            $callId = $VIcall->callID; // Получим ID звонка
 
-        // Создадим Activity
-        $this->addActivity   (
-            [$item['id_record_bx']],
-            $duration,
-            $ownerType
-        );
+            $this->_callID = $callId;
+
+            // Создадим Activity
+            $this->addActivity   (
+                [$item['id_record_bx']],
+                $duration,
+                $ownerType
+            );
+
+        }
 
     }
 
