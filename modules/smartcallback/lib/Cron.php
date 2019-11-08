@@ -22,7 +22,6 @@ class Cron  {
 //        $this->date_from  = $this->date_to - ( Struct::resForLastDays * 24 * 60 * 60 ) ;
 
 
-
     }
 
 

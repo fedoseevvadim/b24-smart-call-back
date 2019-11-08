@@ -14,6 +14,10 @@ class CRMObject  {
     public $arrStruct = [];
     public $mainClassObject;
 
+    private $_entity = "LEAD";
+    private $_connection;
+    private $_tblPerm = "b_crm_entity_perms";
+
     // Options in module, map fields via ID of lead or deal
     public static $arrUtm = [
         "UTM_SOURCE",
@@ -22,7 +26,7 @@ class CRMObject  {
         "UTM_TERM",
         "UTM_CONTENT",
         "UTM_UPDATED",
-        "DOMEN"
+        "DOMEN" //  Да потому что он у них так называется в системе
     ];
 
 
@@ -32,13 +36,16 @@ class CRMObject  {
             $this->arrStruct[$utm]      = \COption::GetOptionString(Struct::MODULE_ID, $utm);
         }
 
+        $this->_connection = \Bitrix\Main\Application::getConnection();
+
     }
 
 
     public function addObject ( array $array, $class ): int {
 
-        $arrStruct  = $this->getStruct();
+        $arrStruct = $this->getStruct();
         $arrStruct["HAS_PHONE"] = "Y";
+        $userID = $array["CREATED_BY_ID"];
 
         $arrStruct["CREATED_BY_ID"]     = $array["CREATED_BY_ID"];
         $arrStruct["MODIFY_BY_ID"]      = $array["MODIFY_BY_ID"];
@@ -72,10 +79,34 @@ class CRMObject  {
 
         if ($res->isSuccess()) {
 
+            $id = $res->getId();
+
+            // attributes
+            $arrAtributes = [
+                "D57", // ХЗ
+                "IU".$userID,
+                "O",
+                "STATUS_IDNEW",
+                "U".$userID
+            ];
+
+            // add permissions
+
+            foreach ( $arrAtributes as $atribute ) {
+
+                $sql = "
+                            INSERT INTO $this->_tblPerm (ENTITY,  ENTITY_ID, ATTR) 
+                            VALUES ('$this->_entity', '$id', '$atribute')
+                        ";
+
+                $this->_connection->query($sql);
+
+            }
+
             // add phone number to additional table
             $arrMT = [
-                "ENTITY_ID"     => "LEAD",
-                "ELEMENT_ID"    => $res->getId(),
+                "ENTITY_ID"     => $this->_entity,
+                "ELEMENT_ID"    => $id,
                 "TYPE_ID"       => "PHONE",
                 "VALUE_TYPE"    => "WORK",
                 "COMPLEX_ID"    => "PHONE_WORK",
@@ -84,7 +115,7 @@ class CRMObject  {
 
             \Bitrix\Crm\FieldMultiTable::add($arrMT);
 
-            return $res->getId();
+            return $id;
 
         }  else  {
             print_r($res->getErrorMessages());
@@ -93,10 +124,10 @@ class CRMObject  {
     }
 
     /**
-     * Check existence of object
-     *
-     * @param phone
-     */
+    * Check existence of object
+    *
+    * @param phone
+    */
     public function checkIfExist ( int $phone ): array {
 
         $arLeads = $this->mainClassObject::getList([
