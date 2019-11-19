@@ -117,7 +117,10 @@ class StatItems extends StatTable {
 
                 $arrUpdate = [
                     "record_url" => $item->record_url,
-                    "record_written" => 0
+                    "duration"  => $item->duration,
+                    "record_written" => 0,
+                    "lead" => 0,
+                    "deal" => 0
                 ];
 
                 $this->updateItem( $itemID, $arrUpdate );
